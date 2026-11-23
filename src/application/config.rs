@@ -1,6 +1,5 @@
-use crate::constants::APP_NAME;
-use crate::error::AppError;
-use crate::error::Result;
+use crate::application::constants::APP_NAME;
+use crate::domain::error::{AppError, Result};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;

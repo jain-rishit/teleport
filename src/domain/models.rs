@@ -13,7 +13,13 @@ pub struct Device {
 }
 
 impl Device {
-    pub fn new(id: String, name: String, manufacturer: String, vendor_id: u16, product_id: u16) -> Self {
+    pub fn new(
+        id: String,
+        name: String,
+        manufacturer: String,
+        vendor_id: u16,
+        product_id: u16,
+    ) -> Self {
         Self {
             id,
             name,

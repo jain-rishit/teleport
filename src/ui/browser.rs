@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use crate::models;
+use crate::domain::models;
 use crate::ui::{AppView, PendingAction, ViewName};
 use gpui::prelude::*;
 use gpui::{Context, Div, IntoElement, MouseButton, Timer, div, px, rgb, rgba};

@@ -1,5 +1,5 @@
-use gpui::{prelude::*, App, Application, Bounds, WindowBounds, WindowOptions, px, size};
-use teleport::{logging, ui::AppView};
+use gpui::{App, Application, Bounds, WindowBounds, WindowOptions, prelude::*, px, size};
+use teleport::{application::logging, ui::AppView};
 
 fn main() {
     Application::new().run(|cx: &mut App| {

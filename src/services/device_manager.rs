@@ -1,6 +1,6 @@
-use crate::error::Result;
-use crate::models::Device;
-use crate::mtp::UsbMonitor;
+use crate::domain::error::Result;
+use crate::domain::models::Device;
+use crate::infrastructure::mtp::UsbMonitor;
 use std::sync::{Arc, Mutex};
 
 pub struct DeviceManager {

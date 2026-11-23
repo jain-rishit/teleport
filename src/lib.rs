@@ -1,8 +1,5 @@
-pub mod config;
-pub mod constants;
-pub mod error;
-pub mod logging;
-pub mod models;
-pub mod mtp;
+pub mod application;
+pub mod domain;
+pub mod infrastructure;
 pub mod services;
 pub mod ui;

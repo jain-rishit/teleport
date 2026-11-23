@@ -1,4 +1,4 @@
-use crate::{models, services};
+use crate::{domain::models, services};
 use gpui::prelude::*;
 use gpui::{Context, Render, Window, div, rgb};
 use std::path::PathBuf;
@@ -66,7 +66,7 @@ impl AppView {
         let device_manager =
             Arc::new(services::DeviceManager::new().expect("failed to create device manager"));
         let file_manager = Arc::new(services::file_manager::FileManager::new());
-        let cfg = crate::config::Config::load().unwrap_or_default();
+        let cfg = crate::application::config::Config::load().unwrap_or_default();
 
         // Initial device scan (synchronous USB enumeration).
         let devices = device_manager.refresh_devices().unwrap_or_default();

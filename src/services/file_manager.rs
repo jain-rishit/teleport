@@ -1,7 +1,6 @@
-use crate::error::{AppError, Result};
-use crate::models::FileEntry;
-use crate::models::FileType;
-use crate::mtp::session::{MtpSession, join_remote_path};
+use crate::domain::error::{AppError, Result};
+use crate::domain::models::{FileEntry, FileType};
+use crate::infrastructure::mtp::session::{MtpSession, join_remote_path};
 use chrono::{DateTime, Utc};
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -84,7 +83,9 @@ impl FileManager {
         destination_dir: &Path,
         is_dir: bool,
         delete_source: bool,
-        progress: Option<std::sync::Arc<std::sync::Mutex<Option<crate::models::TransferProgress>>>>,
+        progress: Option<
+            std::sync::Arc<std::sync::Mutex<Option<crate::domain::models::TransferProgress>>>,
+        >,
     ) -> Result<PathBuf> {
         let device_id = device_id.to_string();
         let remote_path = remote_path.to_string();
@@ -121,7 +122,13 @@ impl FileManager {
                 )?;
                 destination
             } else {
-                download_remote_file(&mut session, &remote_path, &file_name, &destination_dir, progress)?
+                download_remote_file(
+                    &mut session,
+                    &remote_path,
+                    &file_name,
+                    &destination_dir,
+                    progress,
+                )?
             };
 
             if delete_source {
@@ -140,7 +147,9 @@ impl FileManager {
         local_path: &Path,
         remote_parent_path: &str,
         delete_source: bool,
-        progress: Option<std::sync::Arc<std::sync::Mutex<Option<crate::models::TransferProgress>>>>,
+        progress: Option<
+            std::sync::Arc<std::sync::Mutex<Option<crate::domain::models::TransferProgress>>>,
+        >,
     ) -> Result<()> {
         let device_id = device_id.to_string();
         let local_path = local_path.to_path_buf();
@@ -423,18 +432,20 @@ fn download_remote_file(
     remote_path: &str,
     file_name: &str,
     destination_dir: &Path,
-    progress: Option<std::sync::Arc<std::sync::Mutex<Option<crate::models::TransferProgress>>>>,
+    progress: Option<
+        std::sync::Arc<std::sync::Mutex<Option<crate::domain::models::TransferProgress>>>,
+    >,
 ) -> Result<PathBuf> {
     let (_, object_id, _) = resolve_existing_object(session, remote_path)?;
     let destination = unique_destination(destination_dir, file_name);
-    
+
     let file_name_str = file_name.to_string();
     let started_at = std::time::Instant::now();
     let on_progress = |bytes_transferred, total_bytes| {
         if let Some(ref p) = progress
             && let Ok(mut guard) = p.lock()
         {
-            *guard = Some(crate::models::TransferProgress {
+            *guard = Some(crate::domain::models::TransferProgress {
                 file_name: file_name_str.clone(),
                 bytes_transferred,
                 total_bytes,
@@ -453,7 +464,9 @@ fn download_remote_folder(
     parent: u32,
     remote_path: &str,
     destination: &Path,
-    progress: Option<std::sync::Arc<std::sync::Mutex<Option<crate::models::TransferProgress>>>>,
+    progress: Option<
+        std::sync::Arc<std::sync::Mutex<Option<crate::domain::models::TransferProgress>>>,
+    >,
 ) -> Result<()> {
     for child in session.list_files(storage_id, parent, remote_path)? {
         if child.is_dir() {
@@ -475,7 +488,7 @@ fn download_remote_folder(
                 AppError::Mtp(format!("Remote file '{}' has no object id", child.path))
             })?;
             let dest_file = unique_destination(destination, &child.name);
-            
+
             let file_name_str = child.name.clone();
             let started_at = std::time::Instant::now();
             let progress_clone = progress.clone();
@@ -483,7 +496,7 @@ fn download_remote_folder(
                 if let Some(ref p) = progress_clone
                     && let Ok(mut guard) = p.lock()
                 {
-                    *guard = Some(crate::models::TransferProgress {
+                    *guard = Some(crate::domain::models::TransferProgress {
                         file_name: file_name_str.clone(),
                         bytes_transferred,
                         total_bytes,
@@ -491,7 +504,7 @@ fn download_remote_folder(
                     });
                 }
             };
-            
+
             session.download_object_to_file(object_id, &dest_file, on_progress)?;
         }
     }
@@ -503,7 +516,9 @@ fn upload_local_entry(
     session: &mut MtpSession,
     local_path: &Path,
     remote_parent_path: &str,
-    progress: Option<std::sync::Arc<std::sync::Mutex<Option<crate::models::TransferProgress>>>>,
+    progress: Option<
+        std::sync::Arc<std::sync::Mutex<Option<crate::domain::models::TransferProgress>>>,
+    >,
 ) -> Result<()> {
     let name = file_name_string(local_path)?;
     let metadata = fs::metadata(local_path)?;
@@ -514,7 +529,12 @@ fn upload_local_entry(
 
         for entry in fs::read_dir(local_path)? {
             let entry = entry?;
-            upload_local_entry(session, &entry.path(), &child_remote_parent, progress.clone())?;
+            upload_local_entry(
+                session,
+                &entry.path(),
+                &child_remote_parent,
+                progress.clone(),
+            )?;
         }
     } else {
         let file_name_str = name.clone();
@@ -523,7 +543,7 @@ fn upload_local_entry(
             if let Some(ref p) = progress
                 && let Ok(mut guard) = p.lock()
             {
-                *guard = Some(crate::models::TransferProgress {
+                *guard = Some(crate::domain::models::TransferProgress {
                     file_name: file_name_str.clone(),
                     bytes_transferred,
                     total_bytes,

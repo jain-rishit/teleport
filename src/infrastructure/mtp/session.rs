@@ -3,9 +3,9 @@ use std::time::Duration;
 use chrono::{DateTime, NaiveDateTime, Utc};
 use rusb::{Context, Device, DeviceHandle, Direction, TransferType, UsbContext};
 
-use crate::error::{AppError, Result};
-use crate::models::{FileEntry, FileType};
-use crate::mtp::protocol::{ContainerType, OpCode, ResponseCode};
+use crate::domain::error::{AppError, Result};
+use crate::domain::models::{FileEntry, FileType};
+use crate::infrastructure::mtp::protocol::{ContainerType, OpCode, ResponseCode};
 
 const ROOT_PARENT: u32 = 0xFFFF_FFFF;
 const UNDEFINED_OBJECT_FORMAT: u16 = 0x3000;

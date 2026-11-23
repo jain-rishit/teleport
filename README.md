@@ -11,6 +11,20 @@ Teleport is a native macOS file manager for Media Transfer Protocol (MTP) device
 - Preview downloaded files and track transfer progress
 - Configure app preferences and logging
 
+## Project layout
+
+```text
+src/
+├── application/       # App configuration, constants, and logging
+├── domain/            # Core models and application errors
+├── infrastructure/    # USB and MTP protocol integration
+├── services/          # Device discovery and file-transfer use cases
+├── ui/                # GPUI views and user interaction
+├── lib.rs             # Module composition
+└── main.rs            # Application entry point
+tests/                 # Integration tests
+```
+
 ## Requirements
 
 - macOS
